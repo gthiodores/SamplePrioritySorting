@@ -104,7 +104,12 @@ private fun NoteListPage(
             ) { note ->
                 NoteItemView(
                     note = note,
-                    onEvent = onEvent,
+                    button = {
+                        TextButton(
+                            onClick = { onEvent(note.id) },
+                            content = { Text("Shift Priority") },
+                        )
+                    },
                     modifier = Modifier.animateItemPlacement()
                 )
             }
@@ -122,7 +127,12 @@ private fun NoteListPage(
             ) { note ->
                 NoteItemView(
                     note = note,
-                    onEvent = onEvent,
+                    button = {
+                        TextButton(
+                            onClick = { onEvent(note.id) },
+                            content = { Text("Shift Priority") },
+                        )
+                    },
                     modifier = Modifier.animateItemPlacement()
                 )
             }
@@ -133,7 +143,7 @@ private fun NoteListPage(
 @Composable
 private fun NoteItemView(
     note: Note,
-    onEvent: (UUID) -> Unit,
+    button: @Composable () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     var lapse by remember { mutableStateOf(Duration.ZERO) }
@@ -168,10 +178,7 @@ private fun NoteItemView(
             modifier = Modifier.padding(horizontal = 8.dp, vertical = 8.dp),
         )
 
-        TextButton(
-            onClick = { onEvent(note.id) },
-            content = { Text("Shift Priority") },
-        )
+        button()
     }
 }
 

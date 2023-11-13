@@ -16,7 +16,9 @@ import kotlinx.coroutines.flow.update
 import java.util.UUID
 
 class NoteListViewModel : ViewModel() {
-    private val _notes = MutableStateFlow(Note.createFakes())
+    private val _notes = MutableStateFlow(
+        Note.createFakes() + Note.createFakes()
+    )
     private val _strategy = MutableStateFlow(byPriorityAndTimeSort())
     val notes = combine(_notes, _strategy) { items, sort -> sort.execute(items) }
         .flowOn(Dispatchers.Default)
