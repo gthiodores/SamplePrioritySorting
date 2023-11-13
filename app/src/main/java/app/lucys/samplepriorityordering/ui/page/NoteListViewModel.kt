@@ -51,17 +51,12 @@ class NoteListViewModel : ViewModel() {
             is NoteSortEvent.PinnedPriority -> handleSelectPinnedPriority(pin = event.priority)
             NoteSortEvent.SortByPriorityAndTime -> handleSortByPriorityAndTime()
             NoteSortEvent.SortByTimeAndPriority -> handleSortByTimeAndPriority()
-//            NoteSortEvent.TogglePinnedPriority -> handleTogglePinned()
             NoteSortEvent.AcceptSort -> handleAcceptSort()
             NoteSortEvent.CloseWithoutSave -> handleCloseWithoutSave()
             NoteSortEvent.ClosePriorityDropDown -> handleClosesPriority()
             NoteSortEvent.ShowPriorityDropDown -> handleOpenPriority()
         }
     }
-
-//    private fun handleTogglePinned() {
-//        _sortState.update { old -> old.copy(pinPriority = old.pinPriority.toggle()) }
-//    }
 
     private fun handleClosesPriority() {
         _sortState.update { old -> old.copy(isDropDownVisible = false) }
