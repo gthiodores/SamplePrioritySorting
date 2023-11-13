@@ -12,4 +12,11 @@ enum class NotePriority(val power: Int) {
         NORMAL -> "Normal"
         LOW -> "Low Priority"
     }
+
+    fun shift(): NotePriority = when (this) {
+        HIGH -> MEDIUM
+        MEDIUM -> NORMAL
+        NORMAL -> LOW
+        LOW -> HIGH
+    }
 }

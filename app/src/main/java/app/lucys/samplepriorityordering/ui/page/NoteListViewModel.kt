@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.getAndUpdate
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
+import java.util.UUID
 
 class NoteListViewModel : ViewModel() {
     private val _notes = MutableStateFlow(Note.createFakes())
@@ -27,6 +28,12 @@ class NoteListViewModel : ViewModel() {
     val sortState =
         combine(_isSortVisible, _sortState) { isVisible, state -> if (isVisible) state else null }
             .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
+
+    fun shiftPriority(id: UUID) {
+        _notes.update { old ->
+            old.map { if (it.id != id) it else it.copy(priority = it.priority.shift()) }
+        }
+    }
 
     fun openSortDialog() {
         val hasPreviousValue = restoreSortBackup()

@@ -24,7 +24,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
@@ -39,6 +39,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import app.lucys.samplepriorityordering.ui.model.Note
 import kotlinx.datetime.Clock
+import java.util.UUID
 import kotlin.concurrent.timer
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
@@ -69,7 +70,8 @@ fun NoteListRoute(vm: NoteListViewModel = viewModel()) {
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding),
-            notes = notes
+            notes = notes,
+            onEvent = vm::shiftPriority,
         )
     }
 
@@ -84,8 +86,9 @@ fun NoteListRoute(vm: NoteListViewModel = viewModel()) {
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun NoteListPage(
+    onEvent: (UUID) -> Unit,
+    notes: List<Note>,
     modifier: Modifier = Modifier,
-    notes: List<Note>
 ) {
     Row(modifier = modifier) {
         LazyVerticalStaggeredGrid(
@@ -101,6 +104,7 @@ private fun NoteListPage(
             ) { note ->
                 NoteItemView(
                     note = note,
+                    onEvent = onEvent,
                     modifier = Modifier.animateItemPlacement()
                 )
             }
@@ -118,6 +122,7 @@ private fun NoteListPage(
             ) { note ->
                 NoteItemView(
                     note = note,
+                    onEvent = onEvent,
                     modifier = Modifier.animateItemPlacement()
                 )
             }
@@ -128,6 +133,7 @@ private fun NoteListPage(
 @Composable
 private fun NoteItemView(
     note: Note,
+    onEvent: (UUID) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     var lapse by remember { mutableStateOf(Duration.ZERO) }
@@ -135,9 +141,12 @@ private fun NoteItemView(
         lapse.toComponents { m, s, _ -> String.format("%02d:%02d", m, s) }
     }
 
-    LaunchedEffect(key1 = note.id) {
+    DisposableEffect(key1 = note.id) {
         lapse = Clock.System.now().minus(note.time)
-        timer(initialDelay = 100L, period = 1_000L) { lapse = lapse.plus(1.seconds) }
+        val timer = timer(initialDelay = 100L, period = 1_000L) {
+            lapse = lapse.plus(1.seconds)
+        }
+        onDispose { timer.cancel() }
     }
 
     Column(
@@ -157,6 +166,11 @@ private fun NoteItemView(
         Text(
             timeLabel,
             modifier = Modifier.padding(horizontal = 8.dp, vertical = 8.dp),
+        )
+
+        TextButton(
+            onClick = { onEvent(note.id) },
+            content = { Text("Shift Priority") },
         )
     }
 }
